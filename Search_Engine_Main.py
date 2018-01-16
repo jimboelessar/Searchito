@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from invertedindex import InvertedIndex
 import shelve
 import aidkit as kit
@@ -6,8 +8,8 @@ import vectormodel
 from searcheengine import SearchEngine
 
 """ Example of creating an inverted index, updating it and getting references of a term.
-
-database = ["doc1.txt", "doc2.txt", "doc3.txt", "doc4.txt"]
+"""
+'''database = ["doc1.txt", "doc2.txt", "doc3.txt", "doc4.txt"]
 database2 = ["doc5.txt", "doc6.txt"]
 engine = SearchEngine()
 engine.crawl(database)
@@ -15,13 +17,14 @@ engine.print_references("englund")
 engine.print_references("work")
 engine.update_index(database2)
 engine.print_references("work")
-engine.stop()
+engine.stop()'''
 
-"""
 
-""" Print the whole inverted index
 
-with shelve.open('inverted_index') as file:
+
+'''Print the whole inverted index'''
+
+'''with shelve.open('inverted_index') as file:
     for key in file:
         print(key, " -> ", len(file[key]), ": ", file[key])
 
@@ -30,13 +33,12 @@ with shelve.open('inverted_index') as file:
 
 with shelve.open('links') as file:
     for key in file:
-        print(key, " -> ", file[key])
+        print(key, " -> ", file[key])'''
 
-"""
 
 """ Example of making queries in boolean model
-
-engine = SearchEngine()
+"""
+'''engine = SearchEngine()
 queries = []
 queries.append("work")
 queries.append("a")
@@ -53,18 +55,37 @@ queries.append("work or hello bad")
 queries.append("work or hello or")
 
 for query in queries:
-    print(query, "->", engine.execute_query(query, 10, boolean_mode=True))
+    print(query, "->", engine.execute_query(query, boolean_mode=True,max_results=10))
 
 engine.stop()
+'''
 
-"""
+
 
 # Example of making queries in  vector model
-engine = SearchEngine()
+'''engine = SearchEngine()
 queries = []
-queries.append("Zakis zakis is great great great")
+queries.append("Zakis zakis is great great great python")
 
 for query in queries:
-    print(query, "->", engine.execute_query(query, 10))
+    print(query, "->", engine.execute_query(query))
 
-engine.stop()
+engine.stop()'''
+
+engine = SearchEngine()
+engine.crawl('https://github.com/christino156/Searchito/blob/master/searcheengine.py',10)
+engine.print_references("wikipedia")
+
+with shelve.open('inverted_index') as file:
+    for key in file:
+        print(key, " -> ", len(file[key]), ": ", file[key])
+
+
+# Print the links list
+        
+
+'''with shelve.open('links') as file:
+    for key in file:
+        print(key, " -> ", file[key])'''
+
+

@@ -1,13 +1,18 @@
+# -*- coding: utf-8 -*-
+
+
 import shelve
 import aidkit as kit
+from crawella import Crawella
 import math
 import os
 import nltk.tokenize
 from invertedindex import InvertedIndex
-from collections import Counter
+#from collections import Counter
 import booleanmodel
 import vectormodel
-import shelve
+#import shelve
+import time
 
 class SearchEngine:
 
@@ -34,24 +39,6 @@ class SearchEngine:
     def stop(self):
         self.inverted_index.close()
 
-    # Filters the fiven document and for every word inside it writes to disk the 
-    # pair (term, document id, frequency inside document). Returns it's length.
-    def process_doc(self, doc_id, doc_name):
-        # Open temporary file to append each term's frequency
-        terms_file = open(self.temp_filename, 'a')
-        # Open document and read it
-        with open(doc_name, 'r') as doc_file:
-            doc = doc_file.read()
-        filtered_words = kit.filter_text(doc)
-        # Find each term's frequency
-        terms_freq = Counter(filtered_words)
-        # Write pair (term, document id, frequency) to disk
-        for term in terms_freq.keys():
-            terms_file.write("{} {} {}\n".format(term, doc_id, terms_freq[term]))
-        terms_file.close()
-        # Return the length of the document (sqrt of document frequency)
-        return math.sqrt(len(filtered_words))
-
     # Saves to disk the total number of indexed documents and the id of the lated
     # document.
     def save_docs_info(self):
@@ -60,32 +47,21 @@ class SearchEngine:
 
     # Processes the given document names by creating their inverted index and saving 
     # information to disk.
-    def crawl(self, documents):
+    def crawl(self,url,maxLinks):
         if self.is_maintaining:
             return False
         self.is_maintaining = True
-
-        # Open document links dictionary if already exists or create a new one
-        doc_links = shelve.open(self.links_filename, writeback=True)
-        # Clear any previous data
-        doc_links.clear()
-        # Reset last document id
-        self.last_id = 0
-        # Crawl documents and process them one by one
-        for doc_name in documents:
-            self.last_id += 1
-            # Process document by writing it's terms frequency to disk and get it's length
-            length = self.process_doc(self.last_id, doc_name)
-            # Save document's necessary information (key must be string)
-            doc_links[str(self.last_id)] = [doc_name, length]
-        doc_links.close()
-
+        
+        crawler = Crawella()
+        self.last_id = crawler.crawl(url,self.temp_filename,self.links_filename,maxLinks)
         # Create the inverted index of the crawled documents
+        starttime = time.time()
         self.inverted_index.create_inverted_index(self.temp_filename)
         os.remove(self.temp_filename)
+        print(time.time()-starttime, ' sec')
 
         # Update documents info
-        self.no_docs = len(documents) 
+        self.no_docs = self.last_id 
         self.save_docs_info()
         self.is_maintaining = False
 
@@ -114,15 +90,15 @@ class SearchEngine:
         self.save_docs_info()
         self.is_maintaining = False
 
-    # Executes the given query and returns at most a mixmum number of documents.
-    def execute_query(self, query, max_results, boolean_mode=False):
+    # Executes the given query and returns at most a maximum number of documents.
+    def execute_query(self, query, boolean_mode=False, max_results=20, min_similarity=0.6):
         if self.is_maintaining:
             return []
 
         if boolean_mode:
             result = booleanmodel.execute_query(query, max_results, self.inverted_index)
         else:
-            result = vectormodel.execute_query(query, max_results, self.inverted_index, self.links_filename, self.no_docs)
+            result = vectormodel.execute_query(query, self.inverted_index, self.links_filename, self.no_docs, max_results,min_similarity)
 
         return result
 

@@ -3,6 +3,11 @@ from html.parser import HTMLParser
 from urllib.parse import urljoin
 import pickle
 import pathlib
+from bs4 import BeautifulSoup
+import math
+import aidkit as kit
+from collections import Counter
+import shelve
 
 
 ''' HTML Parser '''
@@ -22,12 +27,18 @@ class Parser(HTMLParser):
                         url = urljoin(self.baseUrl, value)
                         # We add it to our list of links:
                         self.links = self.links + [url]
-                    
+                   
+    
+    def handle_data(self,data):
+        self.data.append(data)
+        
+    
                     
     ''' This method collects all outgoing links from the page indicated by 'url' '''
     def getLinks(self, url):
         #Initialize the list of links
         self.links=[]
+        self.data = []
         self.baseUrl = url # It will be used for links within the same page
         try:
             # Open the url for parsing
@@ -40,13 +51,46 @@ class Parser(HTMLParser):
                 htmlString = htmlBytes.decode("utf-8","ignore") # We ignore characters in other encodings such as cp1252
                 #Feed the text to the parser.
                 self.feed(htmlString)
-                return self.links #mporoume na epistrefoume kai to htmlString an to xreiazomaste meta
+                soup = BeautifulSoup(htmlString, 'html.parser')
+                #print(soup.get_text())
+                #print(soup.findAll(text=True))
+                # kill all script and style elements
+                for script in soup(["script", "style"]):
+                    script.extract()    # rip it out
+                
+                # get text
+                text = soup.get_text()
+                
+                # break into lines and remove leading and trailing space on each
+                lines = (line.strip() for line in text.splitlines())
+                # break multi-headlines into a line each
+                chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+                # drop blank lines
+                text = '\n'.join(chunk for chunk in chunks if chunk)
+            
+                return text,self.links 
             else:
-                return []
+                return '',[]
         except Exception as ex:
             # Page not found, Access Forbidden, etc
             print("Exception: ",ex)
-            return []
+            return '',[]
+        
+def process_doc(doc_id, doc, temp_filename):
+        # Open temporary file to append each term's frequency
+        terms_file = open(temp_filename, 'a')
+        # Open document and read it
+        '''with open(doc_name, 'r') as doc_file:
+            doc = doc_file.read()'''
+        filtered_words = kit.filter_text(doc)
+        # Find each term's frequency
+        terms_freq = Counter(filtered_words)
+        # Write pair (term, document id, frequency) to disk
+        for term in terms_freq.keys():
+            terms_file.write("{} {} {}\n".format(term, doc_id, terms_freq[term]))
+        terms_file.close()
+        # Return the length of the document (sqrt of document frequency)
+        return math.sqrt(len(filtered_words))
         
 ''' Link Crawler '''       
 class Crawella():
@@ -57,8 +101,8 @@ class Crawella():
     # This method gathers links beginning from page startUrl and stops when at least maxLinks links have been collected
     # If maxLinks is not defined or maxLinks <= 0, then it stops when there are no more links (that have not already been crawled)
     # If crawlAgain == true, then we crawl the given url even if it has been crawled before
-    def crawl(self,startUrl, maxLinks = 0, crawlAgain = False):
-        numLinks = len(self.crawled)+len(self.toBeCrawled) # In case of archived links
+    def crawl(self,startUrl, tempfile, linkfile ,maxLinks = 0, crawlAgain = False):
+        numLinks = len(self.crawled)#+len(self.toBeCrawled) # In case of archived links
         if crawlAgain:
             # We don't care if this url has been crawled in the past
             self.toBeCrawled.add(startUrl)
@@ -67,15 +111,26 @@ class Crawella():
             if startUrl not in self.crawled and startUrl not in self.toBeCrawled:
                 self.toBeCrawled.add(startUrl) 
         numVisited = 0
+        # Open document links dictionary if already exists or create a new one
+        doc_links = shelve.open(linkfile, writeback=True)
+        # Clear any previous data
+        doc_links.clear()
         # Visit pages until there are no more pages to visit
         while len(self.toBeCrawled) > 0: 
             try:
+                numVisited +=1
                 parser = Parser()
                 url = self.toBeCrawled.pop() # Get one of the links to be crawled
-                numVisited +=1
                 print(numVisited, "Visiting:", url )
-                # Get the links from the next in line url
-                newLinks = parser.getLinks(url)
+                # Get the text and the links from the next in line url
+                text, newLinks = parser.getLinks(url)
+                if (len(text)==0):
+                    numVisited-=1
+                    continue
+                # Process document by writing it's terms frequency to disk and get it's length
+                length = process_doc(numVisited,text,tempfile)
+                # Save document's necessary information (key must be string)
+                doc_links[str(numVisited)] = [url, length]
                 self.crawled.add(url)
                 # And add them to the set of links to be crawled
                 for link in newLinks:
@@ -84,15 +139,18 @@ class Crawella():
                         self.toBeCrawled.add(link)            
             except Exception as ex:
                 print("Exception: ", ex)
-            if (maxLinks > 0 and (len(self.crawled)+len(self.toBeCrawled)) >= (maxLinks+numLinks)):
+                numVisited -=1
+            if (maxLinks > 0 and (len(self.crawled) >= (maxLinks+numLinks))):
                 # We have gathered at least maxLinks links
-                print("Success! At least ", maxLinks, " links have been fetched\n")
+                print("Success! At least ", maxLinks, " links have been crawled\n")
                 break
+        doc_links.close()
         if (maxLinks <= 0):
             print("No more links to fetch!\n")  
         # We combine all the links we have gathered in a dictionary, so that every link has a unique id
         self.links = {key: value for key,value in enumerate(self.crawled.union(self.toBeCrawled))}
         self.toFile()
+        return numVisited
         
     ''' Save crawled and toBeCrawled  links to disk for possible later use '''
     def toFile(self):
@@ -120,7 +178,7 @@ class Crawella():
             self.toBeCrawled = set() 
             
 # Examples
-crawler = Crawella()
-crawler.crawl('https://en.wikipedia.org/wiki/Cruella_de_Ville',1000)
+#crawler = Crawella()
+#crawler.crawl('https://www.quora.com/How-can-I-extract-only-text-data-from-HTML-pages','temp_terms','links',12)
 # Does not crawl the same page twice, instead it crawls one of the archived links (from toBeCrawled.pkl)
-crawler.crawl("https://en.wikipedia.org/wiki/Cruella_de_Ville")
+#crawler.crawl("https://en.wikipedia.org/wiki/Cruella_de_Ville")

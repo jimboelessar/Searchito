@@ -3,11 +3,14 @@ import math
 from collections import Counter
 import shelve
 
-# Calculate the TFt value of the given term.
+# Calculate the TF value of the given term.
 def tf(term, frequency):
-    return 1 + math.log(frequency)
+    if (frequency!=0):
+        return 1 + math.log(frequency)
+    else:
+        return 0
 
-# Calculate the IDFt value of the given term.
+# Calculate the IDF value of the given term.
 def idf(term, no_docs, inverted_index):
     term_doc_freq = len(inverted_index[term])
     if term_doc_freq == 0:
@@ -18,33 +21,22 @@ def idf(term, no_docs, inverted_index):
 
 # Calculate the weight of the value
 def tfidf(term, frequency, no_docs, inverted_index):
-    return tf(term, frequency) * idf(term, no_docs, inverted_index)
+    tf_ =  tf(term, frequency)
+    if (tf_!=0):
+        return  tf_* idf(term, no_docs, inverted_index)
+    else:
+        return 0
 
-def cosineSimilarity(wq, wd, lq, ld):
+def cosineSimilarity(wq, wd, ld):
     dot = sum(wq[i]*wd[i] for i in range(len(wq)))
-    sim = dot/(lq*ld)
+    sim = dot/ld
     return sim
 
-# Executes a query based on the vector model and returns the document ids that match.
-# max_results:  The maximum number of document ids to return.
-def execute_query(query, inverted_index, links_filename, no_docs, max_results = 20, min_similarity = 0.6):
-    #Remove punctuation 
-    terms = kit.filter_text(query)
-    unique_terms = set(terms)
-    query_len = math.sqrt(len(unique_terms)) # approximate length of the query
-    # Create an inverted index consisting of only query terms
-    query_index = {}
-    for term in unique_terms:
-        query_index[term] = inverted_index.get_term_references(term)
-    relatedDocs = set([query_index[term][i][0] for term in unique_terms for i in range(len(query_index[term]))])
-    # Find each term's frequency
-    terms_freq = Counter(terms)
-    # Calculate query weights
-    query_weights = [tfidf(term, terms_freq[term], no_docs, query_index) for term in unique_terms]
-    #Calculate the weights for every related document
-    docs_weights = [] 
-    for doc in relatedDocs :
-        doc_weights=[] 
+def compute_docs_weights(query_index, relevant_docs, no_docs):
+    #Calculate the weights for every relevant document
+    docs_weights = []
+    for doc in relevant_docs :
+        doc_weights=[]
         for term in query_index:
             found = False
             for i in range (len(query_index [term])):
@@ -55,16 +47,38 @@ def execute_query(query, inverted_index, links_filename, no_docs, max_results = 
             if (found==False):
                 doc_weights.append(0)
         docs_weights.append(doc_weights)
+    return docs_weights
+    
+    
+'''Executes a query based on the vector model and returns the document IDs that match.
+   max_results:  The maximum number of documents to return.'''
+def execute_query(query, inverted_index, links_filename, no_docs, max_results = 20):
+    #Remove punctuation 
+    terms = kit.filter_text(query)
+    # Find each term's frequency
+    terms_freq = Counter(terms)
+    unique_terms = set(terms)
+    # Create an inverted index consisting of only query terms
+    query_index = {}
+    for term in unique_terms:
+        query_index[term] = inverted_index.get_term_references(term)
+    relevant_docs = set([query_index[term][i][0] for term in unique_terms for i in range(len(query_index[term]))])
+    # Calculate query weights
+    query_weights = {term : tfidf(term, terms_freq[term], no_docs, query_index) for term in unique_terms}
+    docs_weights = compute_docs_weights(query_index, relevant_docs, no_docs)
     docs_len = {}
     with shelve.open('links') as file:
         for key in file:
             docs_len[int(key)] = file[key][1]
     similarities={}
-    for i,doc in enumerate(relatedDocs):
-        similarities[doc]=cosineSimilarity(query_weights,docs_weights[i],query_len,docs_len[doc])
+    for i,doc in enumerate(relevant_docs):
+        similarities[doc]=cosineSimilarity(list(query_weights.values()),docs_weights[i],docs_len[doc])
     #Sort the documents by descending similarity
     #Turn dictionary into list of tuples (id,similarity)
     similarities = sorted(similarities.items(), key = lambda x : x[1], reverse=True)
     documents = [similarities[i][0] for i in range(len(similarities))]
-    #Return at most max_results documents ranked from best to worst
+    #Return at most max_results documents (IDs) ranked from best to worst
     return documents[:max_results]
+
+
+    

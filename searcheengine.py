@@ -2,9 +2,9 @@
 
 
 import shelve
-import aidkit as kit
+#import aidkit as kit
 from crawella import Crawella
-import math
+#import math
 import os
 import nltk.tokenize
 from invertedindex import InvertedIndex
@@ -18,10 +18,10 @@ class SearchEngine:
 
     def __init__(self):
         self.is_maintaining = False
-        self.index_filename = 'files/inverted_index'
-        self.info_filename = 'files/documents_info.txt'
-        self.links_filename = 'files/links'
-        self.temp_filename = 'files/temp_terms'
+        self.index_filename = 'inverted_index'
+        self.info_filename = 'documents_info.txt'
+        self.links_filename = 'links'
+        self.temp_filename = 'temp_terms'
         self.inverted_index = InvertedIndex(self.index_filename)
         self.inverted_index.open()
 
@@ -91,16 +91,20 @@ class SearchEngine:
         self.is_maintaining = False
 
     # Executes the given query and returns at most a maximum number of documents.
-    def execute_query(self, query, boolean_mode=False, max_results=20, min_similarity=0.6):
+    def execute_query(self, query, boolean_mode=False, max_results=20):
         if self.is_maintaining:
             return []
-
         if boolean_mode:
-            result = booleanmodel.execute_query(query, max_results, self.inverted_index)
+            resultIDs = booleanmodel.execute_query(query, max_results, self.inverted_index)
         else:
-            result = vectormodel.execute_query(query, self.inverted_index, self.links_filename, self.no_docs, max_results,min_similarity)
-
-        return result
+            resultIDs = vectormodel.execute_query(query, self.inverted_index, self.links_filename, self.no_docs, max_results)
+        resultURLs = []
+        print(resultIDs)
+        with shelve.open(self.links_filename) as links:
+            for key in links:
+                if int(key) in resultIDs:
+                    resultURLs.append(links[key][0])
+        return resultURLs
 
     ##TO BE REMOVED## For testing purposes only
     def print_references(self, term):

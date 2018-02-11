@@ -11,14 +11,6 @@
     <body>
         <div id="wrapper">
             <header>
-                <div id="topbar">
-                    <span class="qtype">Vector</span>
-                    <label class="switch">
-                        <input type="checkbox">
-                        <span class="slider round"></span>
-                    </label>
-                    <span class="qtype">Boolean</span>
-                </div>
                 <div>
                     <a href="/">
                         <img src="{{ url_for('static', filename='searchito.png') }}" alt="Searchito Logo" id="logo">
@@ -26,7 +18,7 @@
                 </div>
             </header>
             <main>
-                <form id="searchform" action="" method="get" >
+                <form id="searchform" action="/search" method="get" >
                     <br>
                     <span>
                         <input id="querybox" name="q" title="Search" type="text">
@@ -41,13 +33,40 @@
                         </select>
                     </span>
                     <span> results</span>
-                    <br>
+                    <div id="qtype-check">
+                        <span class="qtype">Vector</span>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider round"></span>
+                        </label>
+                        <span class="qtype">Boolean</span>
+                    </div>
                     <span class="buttspan">
                         <button id="searchbutt">Searchito Searchito</button>
                     </span>
                     <span class="buttspan">
                         <button id="feelluckybutt" type="button" onclick="location.href='http://www.regencycasinos.gr/thessaloniki/el/';">I'm Feeling Lucky</button>
                     </span>
+                </form>
+                <form id="crawlform">
+                    <button id="crawlingbutt" type="button">Crawl</button>
+                    <span> in </span>
+                    <input type="text" id="crawltext" name="c" title="Crawl">
+                    <span> for </span>
+                    <span>
+                        <select id="crawlselect" name="crawlnum" title="crawlnum">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                    </span>
+                    <span> links </span>
+                </form>
+                <form id="uploadform" method="POST" action="/uploader" enctype="multipart/form-data">
+                    <span><em>Upload Documents:</em></span>
+                    <input type="file" name="files" value="Choose File" />
+                    <input type="submit" value="Submit"/>
                 </form>
             </main>
             <footer>

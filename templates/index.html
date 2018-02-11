@@ -7,6 +7,15 @@
         <link rel="icon" type="image/ico" href="{{ url_for('static', filename='pap.ico') }}"/>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
         <title> Searchito </title>
+        <script src="{{ url_for('static', filename='searchSubmit.js') }}"></script>
+        <script>
+            function disableCheckbox() {
+                if(document.getElementById("typeCheck").checked) {
+                    document.getElementById('typeCheckHidden').disabled = true;
+                }
+                return document.getElementByName("q").value!='';
+            }
+        </script>
     </head>
     <body>
         <div id="wrapper">
@@ -18,10 +27,10 @@
                 </div>
             </header>
             <main>
-                <form id="searchform" action="/search" method="get" >
+                <form id="searchform" action="/search" method="get" onsubmit="return disableCheckbox.js" role="search">
                     <br>
                     <span>
-                        <input id="querybox" name="q" title="Search" type="text">
+                        <input id="querybox" name="q" autocomplete="off" spellcheck="false" value="" title="Search" type="text">
                     </span>
                     <span> Top </span>
                     <span>
@@ -36,13 +45,14 @@
                     <div id="qtype-check">
                         <span class="qtype">Vector</span>
                         <label class="switch">
-                            <input type="checkbox">
+                            <input id="typeCheckHidden" type="hidden" name="type" value="vector">
+                            <input id="typeCheck" type="checkbox" name="type" value="boolean">
                             <span class="slider round"></span>
                         </label>
                         <span class="qtype">Boolean</span>
                     </div>
                     <span class="buttspan">
-                        <button id="searchbutt">Searchito Searchito</button>
+                        <input type="submit" value="Searchito Searchito" id="searchbutt"/>
                     </span>
                     <span class="buttspan">
                         <button id="feelluckybutt" type="button" onclick="location.href='http://www.regencycasinos.gr/thessaloniki/el/';">I'm Feeling Lucky</button>

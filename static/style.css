@@ -1,4 +1,4 @@
-body {
+#wrapper {
     text-align: center;
 }
 
@@ -14,7 +14,27 @@ body {
 	margin-left: auto;
 	margin-bottom: 17px;
 	width: 450px;
-	clear: both;
+}
+
+#logoMini {
+    padding-left: 13px;
+    padding-right: 8px;
+    padding-top: 12px;
+    float:left;
+    width: 125px;
+    height: 29px;
+}
+
+#queryboxMini {
+    clear:left;
+    width: 480px;
+    padding: 4px 9px;
+    margin-bottom: 16px;
+    font: 16px arial,sans-serif;
+    border: 1px solid #d9d9d9;
+    border-top-color: silver;
+    color: #000;
+    margin-right: 4px;
 }
 
 #querybox {
@@ -97,6 +117,7 @@ select {
     display: inline-block;
     width: 50px;
     height: 24px;
+    margin-bottom: -6px;
 }
 
 .switch input {
@@ -163,4 +184,23 @@ input:checked + .slider:before {
     position: absolute;
     top: 1%;
     right: 1%;
+}
+
+#qtype-checkMini {
+    margin-left: 16px;
+}
+
+.qtypeMini {
+    display: inline-block;
+    padding: 4px 4px;
+}
+
+#searchHeader {
+    position: absolute;
+    top: 20px;
+    min-width: 1300px;
+}
+
+#doclist {
+    list-style-type: none;
 }

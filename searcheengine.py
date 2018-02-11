@@ -18,10 +18,10 @@ class SearchEngine:
 
     def __init__(self):
         self.is_maintaining = False
-        self.index_filename = 'inverted_index'
-        self.info_filename = 'documents_info.txt'
-        self.links_filename = 'links'
-        self.temp_filename = 'temp_terms'
+        self.index_filename = 'files/inverted_index'
+        self.info_filename = 'files/documents_info.txt'
+        self.links_filename = 'files/links'
+        self.temp_filename = 'files/temp_terms'
         self.inverted_index = InvertedIndex(self.index_filename)
         self.inverted_index.open()
 
@@ -67,8 +67,7 @@ class SearchEngine:
 
     # Updates inverted index with the given documents
     def update_index(self, documents):
-        if self.is_maintaining:
-            return False
+        if self.is_maintaining: return False
         self.is_maintaining = True
 
         # Create a list of documents and their ids

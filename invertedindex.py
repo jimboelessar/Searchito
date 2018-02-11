@@ -48,19 +48,19 @@ class InvertedIndex:
     # ignore_availability:  True to ignore that the index may be currently processed
     def get_term_references(self, term):
         # Try to fetch references from memory index
-        if term in self.memory_index:
-            return self.memory_index[term]
-        # If not in memory, try to fetch references from disk index
-        elif self.is_opened:
+        if term in self.memory_index: memory_refs = self.memory_index[term]
+        else: memory_refs = []
+        #Try to fetch references from disk index
+        if self.is_opened:
             try:
-                return self.inverted_index[term]
+                return self.inverted_index[term] + memory_refs
             except KeyError:
-                return []
+                return memory_refs
         else:
             return []
 
     # Creates a new inverted index from the scratch.
-    def create_inverted_index(self, temp_file_name='terms'):
+    def create_inverted_index(self, temp_file_name='files/terms'):
         open_again = self.is_opened
         self.close()
         # Sort file externally
@@ -127,9 +127,7 @@ class InvertedIndex:
                 if(term in self.memory_index):
                     self.memory_index[term].append([doc_info[0], terms_freq[term]])
                 else:
-                    # Term is not already in the memory index, so it must be updated from the main index, if it already exists
-                    references = self.get_term_references(term)
-                    self.memory_index[term] = references + [[doc_info[0],terms_freq[term]]]
+                    self.memory_index[term] = [[doc_info[0],terms_freq[term]]]
             # If memory index is exceeding the maximum allowed memory size, merge index to the main index in disk
             if sys.getsizeof(self.memory_index) >= self.max_size:
                 merge_indexes()
@@ -172,7 +170,7 @@ class InvertedIndex:
         # Insert new terms or update the ones that already exists from the memory index
         for term in self.memory_index.keys():
             # Update the list of references
-            inv_index[term] = self.memory_index[term]
+            inv_index[term] += self.memory_index[term]
         
         # Memory index is no longer needed
         self.memory_index = {}

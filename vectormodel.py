@@ -67,7 +67,7 @@ def execute_query(query, inverted_index, links_filename, no_docs, max_results = 
     query_weights = {term : tfidf(term, terms_freq[term], no_docs, query_index) for term in unique_terms}
     docs_weights = compute_docs_weights(query_index, relevant_docs, no_docs)
     docs_len = {}
-    with shelve.open('links') as file:
+    with shelve.open(links_filename) as file:
         for key in file:
             docs_len[int(key)] = file[key][1]
     similarities={}

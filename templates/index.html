@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang = "en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content=" A simple search engine in Python.">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/ico" href="{{ url_for('static', filename='pap.ico') }}"/>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+        <title> Searchito </title>
+    </head>
+    <body>
+        <div id="wrapper">
+            <header>
+                <div id="topbar">
+                    <span class="qtype">Vector</span>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <span class="qtype">Boolean</span>
+                </div>
+                <div>
+                    <a href="/">
+                        <img src="{{ url_for('static', filename='searchito.png') }}" alt="Searchito Logo" id="logo">
+                    </a>
+                </div>
+            </header>
+            <main>
+                <form id="searchform" action="" method="get" >
+                    <br>
+                    <span>
+                        <input id="querybox" name="q" title="Search" type="text">
+                    </span>
+                    <span> Top </span>
+                    <span>
+                        <select id="topkselect" name="top" title="Top">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                    </span>
+                    <span> results</span>
+                    <br>
+                    <span class="buttspan">
+                        <button id="searchbutt">Searchito Searchito</button>
+                    </span>
+                    <span class="buttspan">
+                        <button id="feelluckybutt" type="button" onclick="location.href='http://www.regencycasinos.gr/thessaloniki/el/';">I'm Feeling Lucky</button>
+                    </span>
+                </form>
+            </main>
+            <footer>
+
+            </footer>
+        </div>
+    </body>
+</html>

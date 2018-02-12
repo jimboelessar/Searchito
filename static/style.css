@@ -210,14 +210,25 @@ input:checked + .slider:before {
     text-align: left;
     line-height: 1.2;
     margin-top: 0;
-    margin-bottom: 26px;
+    margin-bottom: 8px;
     font-family: arial,sans-serif;
+
 }
 
 #doclist li a:link, #doclist li a:visited {
+    width: 95%;
+    background-color: #f1f1f1;
+    border: 1px solid #969494;
+    padding: 16px 25px;
     text-decoration: none;
+    display: inline-block;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow:hidden !important;
+    text-overflow: ellipsis;
 }
 
 #doclist li a:hover, #doclist li a:active {
+    background-color: #e4e4e4;
     text-decoration: underline;
 }

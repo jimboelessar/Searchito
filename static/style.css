@@ -196,11 +196,28 @@ input:checked + .slider:before {
 }
 
 #searchHeader {
-    position: absolute;
     top: 20px;
     min-width: 1300px;
 }
 
 #doclist {
     list-style-type: none;
+}
+
+#doclist li {
+    font-size: medium;
+    font-weight: normal;
+    text-align: left;
+    line-height: 1.2;
+    margin-top: 0;
+    margin-bottom: 26px;
+    font-family: arial,sans-serif;
+}
+
+#doclist li a:link, #doclist li a:visited {
+    text-decoration: none;
+}
+
+#doclist li a:hover, #doclist li a:active {
+    text-decoration: underline;
 }

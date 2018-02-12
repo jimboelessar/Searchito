@@ -94,7 +94,7 @@ def execute_query(query, max_results, inverted_index):
     documents = tree.evaluate(query_index)
     # Reduce documents to the maximum allowed number (if there are more)
     if len(documents) > max_results:
-        documents = documents[:max_results]
+        documents = list(documents)[:max_results]
     return documents
 
 # Creates and returns a tree of the given expression. 

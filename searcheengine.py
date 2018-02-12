@@ -29,8 +29,7 @@ class SearchEngine:
         self.links_filename = foldername + '/links'
         self.temp_filename = foldername + '/temp_terms'
         self.uploads_folder = 'uploads/'
-        self.documents_folder = 'website/static/server_documents/'
-        self.rel_documents_folder = 'static/server_documents/'
+        self.documents_folder = 'static/server_documents/'
         self.inverted_index = InvertedIndex(self.index_filename)
         self.inverted_index.open()
 
@@ -106,7 +105,7 @@ class SearchEngine:
         # Insert the links and ids of the new documents
         doc_links = shelve.open(self.links_filename, writeback=True)
         for index, doc_name in enumerate(documents):
-            doc_links[str(doc_ids[index][0])] = [self.rel_documents_folder + doc_name, lengths[index]]
+            doc_links[str(doc_ids[index][0])] = [self.documents_folder + doc_name, lengths[index]]
         doc_links.close()
 
         # Update general information about documents

@@ -1,20 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang = "en">
     <head>
         <meta charset="utf-8">
         <meta name="description" content=" A simple search engine in Python.">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" type="image/ico" href="{{ url_for('static', filename='pap.ico') }}"/>
+        <link rel="icon" type="image/ico" href="{{ url_for('static', filename='favicon.png') }}"/>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
         <title> Searchito </title>
-        <script>
-            function disableCheckbox() {
-                if(document.getElementById("typeCheck").checked) {
-                    document.getElementById('typeCheckHidden').disabled = true;
-                }
-                return document.getElementByName("q").value!='';
-            }
-        </script>
     </head>
     <body>
         <div id="wrapper">
@@ -26,10 +18,10 @@
                 </div>
             </header>
             <main>
-                <form id="searchform" action="/search" method="get" onsubmit="return disableCheckbox()" role="search">
+                <form id="searchform" action="/query" method="get" onsubmit="return disableCheckbox()" role="search">
                     <br>
                     <span>
-                        <input id="querybox" name="q" autocomplete="off" spellcheck="false" value="" title="Search" type="text">
+                        <input id="querybox" name="search" autocomplete="off" spellcheck="false" value="{{query}}" title="Search" type="text">
                     </span>
                     <span> Top </span>
                     <span>
@@ -44,8 +36,7 @@
                     <div id="qtype-check">
                         <span class="qtype">Vector</span>
                         <label class="switch">
-                            <input id="typeCheckHidden" type="hidden" name="type" value="vector">
-                            <input id="typeCheck" type="checkbox" name="type" value="boolean">
+                            <input id="typeCheck" type="checkbox" name="mode" value="boolean" {{'checked="checked"' if boolean else ""}}>
                             <span class="slider round"></span>
                         </label>
                         <span class="qtype">Boolean</span>
@@ -57,24 +48,25 @@
                         <button id="feelluckybutt" type="button" onclick="location.href='http://www.regencycasinos.gr/thessaloniki/el/';">I'm Feeling Lucky</button>
                     </span>
                 </form>
-                <form id="crawlform">
-                    <button id="crawlingbutt" type="button">Crawl</button>
+                <form id="crawlform" action="/crawl" method="POST">
+                    <button id="crawlingbutt" name="crawl" type="submit">Crawl</button>
                     <span> in </span>
-                    <input type="text" id="crawltext" name="c" title="Crawl">
+                    <input type="text" id="crawltext" name=crawl-link title="Crawl" value="https://en.wikipedia.org/wiki/Information_retrieval">
                     <span> for </span>
                     <span>
-                        <select id="crawlselect" name="crawlnum" title="crawlnum">
-                            <option value="5">5</option>
+                        <select id="crawlselect" name="crawl-number" title="crawlnum">
                             <option value="10">10</option>
-                            <option value="20">20</option>
                             <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="500">500</option>
+                            <option value="1000">1000</option>
                         </select>
                     </span>
                     <span> links </span>
                 </form>
                 <form id="uploadform" method="POST" action="/uploader" enctype="multipart/form-data">
                     <span><em>Upload Documents:</em></span>
-                    <input type="file" name="files" value="Choose File" />
+                    <input type="file" name="files" value="Choose File" multiple/>
                     <input type="submit" value="Submit"/>
                 </form>
             </main>

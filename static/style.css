@@ -63,7 +63,7 @@
     border: 1px solid #d9d9d9;
     border-top-color: silver;
     color: #000;
-    text-align: right;
+    text-align-last: center;
 }
 
 button, input[type=submit], input[type=file] {
@@ -180,6 +180,15 @@ input:checked + .slider:before {
   left: 1%;
 }
 
+#crawltext {
+    width: 300px;
+}
+
+#crawlselect {
+    width: 40px;
+    text-align-last: center;
+}
+
 #uploadform {
     position: absolute;
     top: 1%;
@@ -198,6 +207,7 @@ input:checked + .slider:before {
 #searchHeader {
     top: 20px;
     min-width: 1300px;
+    border-bottom: 1px solid silver;
 }
 
 #doclist {

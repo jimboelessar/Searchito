@@ -51,8 +51,6 @@ class Parser(HTMLParser):
                 #Feed the text to the parser.
                 self.feed(htmlString)
                 soup = BeautifulSoup(htmlString, 'html.parser')
-                #print(soup.get_text())
-                #print(soup.findAll(text=True))
                 # kill all script and style elements
                 for script in soup(["script", "style"]):
                     script.extract()    # rip it out
@@ -76,17 +74,13 @@ class Parser(HTMLParser):
             return '',[]
     
 # Process document by writing it's terms' frequency to disk and get its length    
-def process_doc(doc_id, doc, temp_filename):
-        # Open temporary file to append each term's frequency
-        terms_file = open(temp_filename, 'a')
-        # Open document and read it
+def process_doc(doc_id, doc, terms_file):
         filtered_words = kit.filter_text(doc)
         # Find each term's frequency
         terms_freq = Counter(filtered_words)
         # Write pair (term, document id, frequency) to disk
         for term in terms_freq.keys():
             terms_file.write("{} {} {}\n".format(term, doc_id, terms_freq[term]))
-        terms_file.close()
         # Return the length of the document (sqrt of document frequency)
         return math.sqrt(len(filtered_words))
         
@@ -111,6 +105,7 @@ class Crawella():
         numIndexed = 0
         # Open document links dictionary if it already exists or create a new one
         doc_links = shelve.open(linkfile, writeback=True)
+        terms_file = open(tempfile, 'a')
         # Visit pages until there are no more pages to visit
         while len(toBeCrawled) > 0: 
             if (maxLinks > 0 and (numVisited >= maxLinks)):
@@ -137,7 +132,7 @@ class Crawella():
                     continue        
                 numIndexed += 1
                 # Process document for future use
-                length = process_doc(lastID + numIndexed,text,tempfile)
+                length = process_doc(lastID + numIndexed,text,terms_file)
                 # Save document's necessary information (key must be string)
                 doc_links[str(lastID + numIndexed)] = [url, length]
                 crawled.add(url)
@@ -147,6 +142,7 @@ class Crawella():
                 numVisited -=1
                 continue
         doc_links.close()
+        terms_file.close()
         if (maxLinks <= 0):
             print("No more links to fetch!\n")  
         with open(indexedURLs, 'wb') as f:

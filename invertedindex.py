@@ -169,8 +169,12 @@ class InvertedIndex:
 
         # Insert new terms or update the ones that already exists from the memory index
         for term in self.memory_index.keys():
-            # Update the list of references
-            inv_index[term] += self.memory_index[term]
+            try:
+                # If term already exists
+                inv_index[term] += self.memory_index[term]
+            except KeyError:
+                # If term is new
+                inv_index[term] = self.memory_index[term]
         
         # Memory index is no longer needed
         self.memory_index = {}

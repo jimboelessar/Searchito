@@ -4,11 +4,13 @@ import string
 import shelve
 import re # Regular Expressions
 from nltk.stem.porter import *
+import os
 
-# Filters text by removing punctiations, allowing only english letters and numbers,
+# Filters text by removing punctiations, allowing only english letters and
+# numbers,
 # tokkenizing text to words and apply stemming.
 def filter_text(text):
-    # Remove every punctuation. e.g.  "That's." -> "Thats"
+    # Remove every punctuation.  e.g.  "That's." -> "Thats"
     for punct in string.punctuation:
         text = text.replace(punct,'')
     # Tokenize text to words
@@ -30,3 +32,20 @@ def filter_boolean_expression(expression):
     for punct in punctuations:
         expression = expression.replace(punct, '')
     return expression
+
+# If the basename of the file already exists in the target folder, returns a
+# new name for the file, else returns the basename.
+def resolve_conflict(target_folder, basename):
+        """
+        From Flesk-Uploads package.
+        """
+        if not os.path.exists(os.path.join(target_folder, basename)):
+            return basename
+
+        name, ext = os.path.splitext(basename)
+        count = 0
+        while True:
+            count = count + 1
+            newname = '%s(%d)%s' % (name, count, ext)
+            if not os.path.exists(os.path.join(target_folder, newname)):
+                return newname

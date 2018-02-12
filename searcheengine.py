@@ -2,9 +2,8 @@
 
 
 import shelve
-#import aidkit as kit
+import aidkit as kit
 from crawella import Crawella
-#import math
 import os
 import nltk.tokenize
 from invertedindex import InvertedIndex
@@ -13,6 +12,9 @@ import booleanmodel
 import vectormodel
 #import shelve
 import time
+from os import listdir
+from os.path import isfile, join
+import shutil
 
 class SearchEngine:
 
@@ -22,6 +24,9 @@ class SearchEngine:
         self.info_filename = 'files/documents_info.txt'
         self.links_filename = 'files/links'
         self.temp_filename = 'files/temp_terms'
+        self.uploads_folder = 'uploads/'
+        self.documents_folder = 'website/static/server_documents/'
+        self.rel_documents_folder = 'static/server_documents/'
         self.inverted_index = InvertedIndex(self.index_filename)
         self.inverted_index.open()
 
@@ -65,28 +70,42 @@ class SearchEngine:
         self.save_docs_info()
         self.is_maintaining = False
 
-    # Updates inverted index with the given documents
-    def update_index(self, documents):
+    # Updates inverted index with the documents inside the uploads folder.
+    def update_from_uploaded(self):
         if self.is_maintaining: return False
         self.is_maintaining = True
 
-        # Create a list of documents and their ids
+        documents = [] # The name of the documents to index
+        # Move documents from temporal uploads to permanent documents 
+        uploaded_documents = [f for f in listdir(self.uploads_folder) if isfile(join(self.uploads_folder, f))] # Get documents name
+        for f in uploaded_documents:
+            # If document name already exists in the local documents, change its name
+            new_name = kit.resolve_conflict(self.documents_folder, f)
+            os.rename(self.uploads_folder + f, self.uploads_folder + new_name)
+            # Add document name to the list of documents to index
+            documents.append(new_name)
+            # Move document to the local documents
+            shutil.move(self.uploads_folder + new_name, self.documents_folder[:-1])
+
+        # Create a list of documents path and their ids
         doc_ids = []
         for doc_name in documents:
             self.last_id += 1
-            doc_ids.append([self.last_id, doc_name])
+            doc_ids.append([self.last_id, self.documents_folder + f])
     
-        # Update the inverted index and get documents' length
+        # Update the inverted index and get documents length
         lengths = self.inverted_index.update_index(doc_ids)
 
-        # Update links to documents
+        # Insert the links and ids of the new documents
         doc_links = shelve.open(self.links_filename, writeback=True)
         for index, doc_name in enumerate(documents):
-            doc_links[str(doc_ids[index][0])] = [doc_name, lengths[index]]
+            doc_links[str(doc_ids[index][0])] = [self.rel_documents_folder + doc_name, lengths[index]]
         doc_links.close()
 
+        # Update general information about documents
         self.no_docs += len(documents)
         self.save_docs_info()
+
         self.is_maintaining = False
 
     # Executes the given query and returns at most a maximum number of documents.

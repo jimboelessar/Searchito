@@ -15,15 +15,19 @@ import time
 from os import listdir
 from os.path import isfile, join
 import shutil
+import pathlib
 
 class SearchEngine:
 
     def __init__(self):
         self.is_maintaining = False
-        self.index_filename = 'files/inverted_index'
-        self.info_filename = 'files/documents_info.txt'
-        self.links_filename = 'files/links'
-        self.temp_filename = 'files/temp_terms'
+        foldername = 'files'
+        # If the folder does not exist, we create it
+        pathlib.Path(foldername).mkdir(parents=True, exist_ok=True)
+        self.index_filename = foldername + '/inverted_index'
+        self.info_filename = foldername + '/documents_info.txt'
+        self.links_filename = foldername + '/links'
+        self.temp_filename = foldername + '/temp_terms'
         self.uploads_folder = 'uploads/'
         self.documents_folder = 'website/static/server_documents/'
         self.rel_documents_folder = 'static/server_documents/'
@@ -56,17 +60,20 @@ class SearchEngine:
         if self.is_maintaining:
             return False
         self.is_maintaining = True
-        
+
         crawler = Crawella()
-        self.last_id = crawler.crawl(url,self.temp_filename,self.links_filename,maxLinks)
-        # Create the inverted index of the crawled documents
-        starttime = time.time()
+        num_crawled_docs = crawler.crawl(url,self.temp_filename,self.links_filename,maxLinks, self.last_id)
+        starttime = time.time() # TO BE REMOVED
+        if (num_crawled_docs == 0):
+            print("Unable to crawl from the given URL. Please try with a different one.")
+            return         
+        # Create or update the inverted index 
         self.inverted_index.create_inverted_index(self.temp_filename)
         os.remove(self.temp_filename)
-        print(time.time()-starttime, ' sec')
-
-        # Update documents info
-        self.no_docs = self.last_id 
+        print('Built/Updated index in:', time.time()-starttime, ' sec') # TO BE REMOVED
+        # Update documents' info
+        self.last_id += num_crawled_docs
+        self.no_docs += num_crawled_docs
         self.save_docs_info()
         self.is_maintaining = False
 
@@ -117,7 +124,6 @@ class SearchEngine:
         else:
             resultIDs = vectormodel.execute_query(query, self.inverted_index, self.links_filename, self.no_docs, max_results)
         resultURLs = []
-        print(resultIDs)
         with shelve.open(self.links_filename) as links:
             for key in links:
                 if int(key) in resultIDs:

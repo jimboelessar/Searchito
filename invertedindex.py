@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-import string
+
 import shelve
-import os
 import sys
 import math
 from csvsorting import csvsort
@@ -59,8 +58,8 @@ class InvertedIndex:
         else:
             return []
 
-    # Creates a new inverted index from the scratch.
-    def create_inverted_index(self, temp_file_name='files/terms'):
+    # Creates a new inverted index from scratch.
+    def create_inverted_index(self, temp_file_name):
         open_again = self.is_opened
         self.close()
         # Sort file externally
@@ -69,8 +68,6 @@ class InvertedIndex:
         # Create the inverted index to disk
         # Open index if already exists or create a new one
         inv_index = shelve.open(self.filename)
-        # Clear any previous data
-        inv_index.clear()
         terms_file = open(temp_file_name, 'r')
 
         # Create index while merging references of the same term
@@ -85,11 +82,16 @@ class InvertedIndex:
             if(firstRow):
                 term = term_record[0]
                 references = []
-                firstRow = False;
-            # If current term is different from the previous one, then merging fom previous term is completed
+                firstRow = False
+            # If current term is different from the previous one, then merging for previous term is completed
             elif term_record[0] != term:
                 # Write previous term to index
-                inv_index[term] = references
+                try:
+                    # If term already exists
+                    inv_index[term] += references
+                except KeyError:
+                    # If term is new
+                    inv_index[term] = references
                 # Initialize references of the new term
                 term = term_record[0]
                 references = []
@@ -103,6 +105,7 @@ class InvertedIndex:
 
         if open_again:
             self.open()
+            
 
     # Updates the inverted index with new documents. The new index is kept in memory until
     # it reaches max_size and then it is written to disk.

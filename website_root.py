@@ -23,8 +23,8 @@ def results():
     global engine
     query = request.args.get('search')
     top = request.args.get('top')
-    if request.args.get('mode'): boolean = True
-    else: boolean = False
+    if request.args.get('mode'): boolean = False
+    else: boolean = True
     print("Boolean: ", boolean)
     results = engine.execute_query(query, boolean, int(top))
 

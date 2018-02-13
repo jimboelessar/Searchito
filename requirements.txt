@@ -1,0 +1,6 @@
+# Install via 'pip install -r requirements.txt'
+
+flask
+boolean
+boolean.py
+nltk

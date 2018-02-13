@@ -21,7 +21,7 @@
                 <form id="searchform" action="/query" method="get" onsubmit="return search.value!=''" role="search">
                     <br>
                     <span>
-                        <input id="querybox" name="search" placeholder="(Metallica and not Beyonce) or Manowar " autocomplete="off" spellcheck="false" value="{{query}}" title="Search" type="text">
+                        <input id="querybox" name="search" placeholder="" autocomplete="off" spellcheck="false" value="{{query}}" title="Search" type="text">
                     </span>
                     <span> Top </span>
                     <span>
@@ -36,7 +36,7 @@
                     <div id="qtype-check">
                         <span class="qtype">Boolean</span>
                         <label class="switch">
-                            <input id="typeCheck" type="checkbox" name="mode" value="vector" {{'checked="checked"' if boolean else ""}}>
+                            <input id="typeCheck" type="checkbox" autocomplete="off" name="mode" value="vector" {{'' if boolean else 'checked="checked"'}}>
                             <span class="slider round"></span>
                         </label>
                         <span class="qtype">Vector</span>
@@ -74,6 +74,6 @@
 
             </footer>
         </div>
-    <script src="{{ url_for('static', filename='disablePlaceholder.js') }}"></script>
+        <script src="{{ url_for('static', filename='disablePlaceholder.js') }}"></script>
     </body>
 </html>

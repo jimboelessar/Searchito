@@ -17,7 +17,7 @@
                 </span>
                     <form id="searchform" action="/query" method="get" onsubmit="return search.value!=''" role="search">
                         <span>
-                            <input id="queryboxMini" name="search" autocomplete="off" spellcheck="false" value="{{query}}" title="Search" type="text" >
+                            <input id="queryboxMini" name="search" placeholder="" autocomplete="off" spellcheck="false" value="{{query}}" title="Search" type="text" >
                         </span>
                         <span class="buttspan">
                             <input type="submit" value="Searchito Searchito" id="searchbutt"/>
@@ -35,7 +35,7 @@
                         <span id="qtype-check">
                             <span class="qtypeMini">Boolean</span>
                             <label class="switch">
-                                <input id="typeCheck" type="checkbox" name="mode" value="vector" {{'checked="checked"' if boolean == False else ""}}>
+                                <input id="typeCheck" type="checkbox" autocomplete="off" name="mode" value="vector" {{'' if boolean else 'checked="checked"'}}>
                                 <span class="slider round"></span>
                             </label>
                             <span class="qtypeMini">Vector</span>
@@ -55,5 +55,6 @@
 
             </footer>
         </div>
+        <script src="{{ url_for('static', filename='disablePlaceholder.js') }}"></script>
     </body>
 </html>

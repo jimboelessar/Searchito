@@ -40,6 +40,7 @@ def crawl():
 @app.route('/uploader', methods = ['POST'])
 def upload_files():
    if request.method == 'POST':
+      kit.create_dicrectory(engine.uploads_folder)
       for f in request.files.getlist('files'):
         filename = kit.resolve_conflict(engine.uploads_folder, secure_filename(f.filename))
         f.save(engine.uploads_folder + filename)

@@ -83,6 +83,7 @@ class SearchEngine:
 
         documents = [] # The name of the documents to index
         # Move documents from temporal uploads to permanent documents 
+        kit.create_dicrectory(self.documents_folder)
         uploaded_documents = [f for f in listdir(self.uploads_folder) if isfile(join(self.uploads_folder, f))] # Get documents name
         for f in uploaded_documents:
             # If document name already exists in the local documents, change its name

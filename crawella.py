@@ -27,20 +27,13 @@ class Parser(HTMLParser):
                         # We add it to our list of links:
                         self.links = self.links + [url]
                    
-    
-    def handle_data(self,data):
-        self.data.append(data)
-        
-    
-                    
     ''' This method collects all outgoing links from the page indicated by 'url' '''
-    def getLinks(self, url):
+    def getTextAndLinks(self, url):
         #Initialize the list of links
         self.links=[]
-        self.data = []
-        self.baseUrl = url # It will be used for links within the same page
+        self.baseUrl = url # It will be used to construct absolute URLs from relative URLs 
         try:
-            # Open the url for parsing
+            # Open the URL for parsing
             response = urllib.request.urlopen(url)
             # We are only interested in HTML
             if 'text/html' in response.getheader('Content-Type'):
@@ -51,20 +44,17 @@ class Parser(HTMLParser):
                 #Feed the text to the parser.
                 self.feed(htmlString)
                 soup = BeautifulSoup(htmlString, 'html.parser')
-                # kill all script and style elements
+                # Remove all script and style elements
                 for script in soup(["script", "style"]):
-                    script.extract()    # rip it out
-                
-                # get text
-                text = soup.get_text()
-                
-                # break into lines and remove leading and trailing space on each
+                    script.extract()          
+                # Get text
+                text = soup.get_text()                
+                # Break into lines and remove leading and trailing space on each
                 lines = (line.strip() for line in text.splitlines())
-                # break multi-headlines into a line each
+                # Break multi-headlines into a line each
                 chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-                # drop blank lines
-                text = '\n'.join(chunk for chunk in chunks if chunk)
-            
+                # Drop blank lines
+                text = '\n'.join(chunk for chunk in chunks if chunk)            
                 return text,self.links 
             else:
                 return '',[]
@@ -83,6 +73,7 @@ def process_doc(doc_id, doc, terms_file):
             terms_file.write("{} {} {}\n".format(term, doc_id, terms_freq[term]))
         # Return the length of the document (sqrt of document frequency)
         return math.sqrt(len(filtered_words))
+    
         
 ''' Link Crawler '''       
 class Crawella():     
@@ -118,7 +109,7 @@ class Crawella():
                 url = toBeCrawled.pop() # Get one of the links to be crawled
                 print(numVisited, "Visiting:", url ) #TO BE REMOVED
                 # Get the text and the links from the next in line url
-                text, newLinks = parser.getLinks(url)
+                text, newLinks = parser.getTextAndLinks(url)
                 if (len(text)==0): #An error occured (e.g. forbidden access), we continue with the next url
                     numVisited-=1
                     continue
@@ -144,7 +135,8 @@ class Crawella():
         doc_links.close()
         terms_file.close()
         if (maxLinks <= 0):
-            print("No more links to fetch!\n")  
+            print("No more links to fetch!\n")  #TO BE REMOVED
         with open(indexedURLs, 'wb') as f:
+            # Save the URLs that were preprocessed in a file
             pickle.dump(links,f)
         return numIndexed

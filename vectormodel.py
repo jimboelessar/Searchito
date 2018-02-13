@@ -3,14 +3,14 @@ import math
 from collections import Counter
 import shelve
 
-# Calculate the TF value of the given term.
+# Calculates the TF value of the given term.
 def tf(term, frequency):
     if (frequency!=0):
         return 1 + math.log(frequency)
     else:
         return 0
 
-# Calculate the IDF value of the given term.
+# Calculates the IDF value of the given term.
 def idf(term, no_docs, inverted_index):
     term_doc_freq = len(inverted_index[term])
     if term_doc_freq == 0:
@@ -19,21 +19,22 @@ def idf(term, no_docs, inverted_index):
         # Filter negative values to zero
         return max(0, math.log(1 + (no_docs/term_doc_freq)))
 
-# Calculate the weight of the value
+# Calculates the weight of the value
 def tfidf(term, frequency, no_docs, inverted_index):
     tf_ =  tf(term, frequency)
     if (tf_!=0):
         return  tf_* idf(term, no_docs, inverted_index)
     else:
         return 0
-
+    
+# Calculates the cosine similarity betwwen a query and a document (in general betwwen two documents)
 def cosineSimilarity(wq, wd, ld):
     dot = sum(wq[i]*wd[i] for i in range(len(wq)))
     sim = dot/ld
     return sim
 
+#Calculates the weights for every relevant document
 def compute_docs_weights(query_index, relevant_docs, no_docs):
-    #Calculate the weights for every relevant document
     docs_weights = []
     for doc in relevant_docs :
         doc_weights=[]

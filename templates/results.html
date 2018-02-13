@@ -15,7 +15,7 @@
                         <img src="{{ url_for('static', filename='searchito.png') }}" alt="Searchito Logo" id="logoMini">
                     </a>
                 </span>
-                    <form id="searchform" action="/query" method="get" onsubmit="return disableCheckbox()" role="search">
+                    <form id="searchform" action="/query" method="get" onsubmit="return search.value!=''" role="search">
                         <span>
                             <input id="queryboxMini" name="search" autocomplete="off" spellcheck="false" value="{{query}}" title="Search" type="text" >
                         </span>
@@ -33,18 +33,18 @@
                         </span>
                         <span> results</span>
                         <span id="qtype-check">
-                            <span class="qtypeMini">Vector</span>
+                            <span class="qtypeMini">Boolean</span>
                             <label class="switch">
-                                <input id="typeCheck" type="checkbox" name="mode" value="boolean" {{'checked="checked"' if boolean else ""}}>
+                                <input id="typeCheck" type="checkbox" name="mode" value="vector" {{'checked="checked"' if boolean == False else ""}}>
                                 <span class="slider round"></span>
                             </label>
-                            <span class="qtypeMini">Boolean</span>
+                            <span class="qtypeMini">Vector</span>
                         </span>
                     </form>
             </header>
             <main>
                 <ul id="doclist">
-                    {% for result in results %}
+                    {% for result in results[::-1] %}
                     <li>
                         <a href="{{result}}">{{result}}</a>
                     </li>

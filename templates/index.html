@@ -18,10 +18,10 @@
                 </div>
             </header>
             <main>
-                <form id="searchform" action="/query" method="get" onsubmit="return disableCheckbox()" role="search">
+                <form id="searchform" action="/query" method="get" onsubmit="return search.value!=''" role="search">
                     <br>
                     <span>
-                        <input id="querybox" name="search" autocomplete="off" spellcheck="false" value="{{query}}" title="Search" type="text">
+                        <input id="querybox" name="search" placeholder="(Metallica and not Beyonce) or Manowar " autocomplete="off" spellcheck="false" value="{{query}}" title="Search" type="text">
                     </span>
                     <span> Top </span>
                     <span>
@@ -34,12 +34,12 @@
                     </span>
                     <span> results</span>
                     <div id="qtype-check">
-                        <span class="qtype">Vector</span>
+                        <span class="qtype">Boolean</span>
                         <label class="switch">
-                            <input id="typeCheck" type="checkbox" name="mode" value="boolean" {{'checked="checked"' if boolean else ""}}>
+                            <input id="typeCheck" type="checkbox" name="mode" value="vector" {{'checked="checked"' if boolean else ""}}>
                             <span class="slider round"></span>
                         </label>
-                        <span class="qtype">Boolean</span>
+                        <span class="qtype">Vector</span>
                     </div>
                     <span class="buttspan">
                         <input type="submit" value="Searchito Searchito" id="searchbutt"/>
@@ -74,5 +74,6 @@
 
             </footer>
         </div>
+    <script src="{{ url_for('static', filename='disablePlaceholder.js') }}"></script>
     </body>
 </html>

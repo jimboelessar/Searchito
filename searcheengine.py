@@ -114,7 +114,7 @@ class SearchEngine:
 
         self.is_maintaining = False
 
-    # Executes the given query and returns at most a maximum number of documents.
+    # Executes the given query and returns at most max_results documents.
     def execute_query(self, query, boolean_mode=False, max_results=20):
         if self.is_maintaining:
             return []
@@ -124,9 +124,8 @@ class SearchEngine:
             resultIDs = vectormodel.execute_query(query, self.inverted_index, self.links_filename, self.no_docs, max_results)
         resultURLs = []
         with shelve.open(self.links_filename) as links:
-            for key in links:
-                if int(key) in resultIDs:
-                    resultURLs.append(links[key][0])
+            for id in resultIDs:
+                resultURLs.append(links[str(id)][0])
         return resultURLs
 
     ##TO BE REMOVED## For testing purposes only

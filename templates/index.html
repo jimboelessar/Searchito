@@ -69,10 +69,8 @@
                     <input type="file" name="files" value="Choose File" multiple/>
                     <input type="submit" value="Submit"/>
                 </form>
-                {% if False %}
-                    <div id="infoMessage">
-                        This is a Test. \(^_^)/
-                    </div>
+                {% if message %}
+                    <div id="infoMessage"> {{message}} </div>
                 {% endif %}
             </main>
             <footer>

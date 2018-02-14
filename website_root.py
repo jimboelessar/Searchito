@@ -35,7 +35,7 @@ def crawl():
     url = request.form['crawl-link']
     no_sites = request.form['crawl-number']
     engine.crawl(url, int(no_sites))
-    return redirect(url_for('index'))
+    return render_template("index.html", message="Crawling completed successfully!")
 
 @app.route('/uploader', methods = ['POST'])
 def upload_files():
@@ -45,7 +45,7 @@ def upload_files():
         filename = kit.resolve_conflict(engine.uploads_folder, secure_filename(f.filename))
         f.save(engine.uploads_folder + filename)
       engine.update_from_uploaded()
-      return redirect(url_for('index'))
+      return render_template("index.html", message="The files were uploaded succesfully!")
 
 @app.route('/admin/shutdown')
 def shutdown():

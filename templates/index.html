@@ -8,7 +8,7 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
         <title> Searchito </title>
     </head>
-    <body>
+    <body id="index-body">
         <div id="wrapper">
             <header>
                 <div>
@@ -69,6 +69,11 @@
                     <input type="file" name="files" value="Choose File" multiple/>
                     <input type="submit" value="Submit"/>
                 </form>
+                {% if False %}
+                    <div id="infoMessage">
+                        This is a Test. \(^_^)/
+                    </div>
+                {% endif %}
             </main>
             <footer>
 

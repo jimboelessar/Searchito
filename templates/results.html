@@ -43,13 +43,27 @@
                     </form>
             </header>
             <main>
-                <ul id="doclist">
-                    {% for result in results[::-1] %}
-                    <li>
-                        <a href="{{result}}">{{result}}</a>
-                    </li>
-                    {% endfor %}
-                </ul>
+                {% if not results %}
+                    <div id="noResults">
+                        <p>The query - <b id="queryResult">{{query}}</b> - didn't find any documents.</p>
+                        <p>Hints:</p>
+                        <ul id="hintList">
+                            <li>Make sure the spelling of the words is correct.</li>
+                            <li>Try other keywords.</li>
+                            <li>Try more general keywords.</li>
+                            <li>Try less keywords.</li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <p id="resultNum">{{results.__len__()}} results</p>
+                    <ul id="doclist">
+                        {% for result in results[::-1] %}
+                            <li>
+                                <a href="{{result}}">{{result}}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
             </main>
             <footer>
 

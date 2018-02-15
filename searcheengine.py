@@ -7,16 +7,13 @@ from crawella import Crawella
 import os
 import nltk.tokenize
 from invertedindex import InvertedIndex
-#from collections import Counter
 import booleanmodel
 import vectormodel
-#import shelve
 import time
 from os import listdir
 from os.path import isfile, join
 import shutil
 import pathlib
-nltk.download('punkt')
 
 class SearchEngine:
 
@@ -45,8 +42,9 @@ class SearchEngine:
             self.no_docs = 0
             self.last_id = 0
 
-    def stop(self):
+    def restart(self):
         self.inverted_index.close()
+        self.inverted_index.open()
 
     # Saves to disk the total number of indexed documents and the id of the lated
     # document.
@@ -63,14 +61,12 @@ class SearchEngine:
 
         crawler = Crawella()
         num_crawled_docs = crawler.crawl(url,self.temp_filename,self.links_filename,maxLinks, self.last_id)
-        starttime = time.time() # TO BE REMOVED
         if (num_crawled_docs == 0):
-            print("Unable to crawl from the given URL. Please try with a different one.")
+            print("Unable to crawl from the given URL.")
             return         
         # Create or update the inverted index 
         self.inverted_index.create_inverted_index(self.temp_filename)
         os.remove(self.temp_filename)
-        print('Built/Updated index in:', time.time()-starttime, ' sec') # TO BE REMOVED
         # Update documents' info
         self.last_id += num_crawled_docs
         self.no_docs += num_crawled_docs
@@ -87,13 +83,21 @@ class SearchEngine:
         kit.create_dicrectory(self.documents_folder)
         uploaded_documents = [f for f in listdir(self.uploads_folder) if isfile(join(self.uploads_folder, f))] # Get documents name
         for f in uploaded_documents:
-            # If document name already exists in the local documents, change its name
-            new_name = kit.resolve_conflict(self.documents_folder, f)
-            os.rename(self.uploads_folder + f, self.uploads_folder + new_name)
-            # Add document name to the list of documents to index
-            documents.append(new_name)
-            # Move document to the local documents
-            shutil.move(self.uploads_folder + new_name, self.documents_folder[:-1])
+            # Try to decode the file or else ignore it
+            try:
+                # Try to read the file
+                with open(self.uploads_folder + f, 'r') as doc_file:
+                    doc_file.read()
+                # If document name already exists in the local documents, change its name
+                new_name = kit.resolve_conflict(self.documents_folder, f)
+                os.rename(self.uploads_folder + f, self.uploads_folder + new_name)
+                # Add document name to the list of documents to index
+                documents.append(new_name)
+                # Move document to the local documents
+                shutil.move(self.uploads_folder + new_name, self.documents_folder[:-1])
+            except UnicodeDecodeError as e:
+                # Delete file, can not decode it
+                os.remove(self.uploads_folder + f)
 
         # Create a list of documents path and their ids
         doc_ids = []
@@ -129,7 +133,3 @@ class SearchEngine:
             for id in resultIDs:
                 resultURLs.append(links[str(id)][0])
         return resultURLs
-
-    ##TO BE REMOVED## For testing purposes only
-    def print_references(self, term):
-        print(self.inverted_index.get_term_references(term))

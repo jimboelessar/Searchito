@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 import nltk.tokenize
 import string
-import shelve
 import re # Regular Expressions
-from nltk.stem.porter import *
-import os
-import shutil
 import os
 import errno
+from nltk.stem.porter import *
 
 # Filters text by removing punctiations, allowing only english letters and
 # numbers,

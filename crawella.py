@@ -101,13 +101,13 @@ class Crawella():
         while len(toBeCrawled) > 0: 
             if (maxLinks > 0 and (numVisited >= maxLinks)):
                 # We have processed maxLinks links
-                print("Success! ", maxLinks, " pages have been crawled\n")
+                print(maxLinks, " pages have been crawled.\n")
                 break
             try:
                 numVisited +=1
                 parser = Parser()
                 url = toBeCrawled.pop() # Get one of the links to be crawled
-                print(numVisited, "Visiting:", url ) #TO BE REMOVED
+                print(numVisited)
                 # Get the text and the links from the next in line url
                 text, newLinks = parser.getTextAndLinks(url)
                 if (len(text)==0): #An error occured (e.g. forbidden access), we continue with the next url
@@ -134,8 +134,6 @@ class Crawella():
                 continue
         doc_links.close()
         terms_file.close()
-        if (maxLinks <= 0):
-            print("No more links to fetch!\n")  #TO BE REMOVED
         with open(indexedURLs, 'wb') as f:
             # Save the URLs that were preprocessed in a file
             pickle.dump(links,f)

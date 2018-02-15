@@ -61,16 +61,14 @@ class SearchEngine:
 
         crawler = Crawella()
         num_crawled_docs = crawler.crawl(url,self.temp_filename,self.links_filename,maxLinks, self.last_id)
-        if (num_crawled_docs == 0):
-            print("Unable to crawl from the given URL.")
-            return         
-        # Create or update the inverted index 
-        self.inverted_index.create_inverted_index(self.temp_filename)
-        os.remove(self.temp_filename)
-        # Update documents' info
-        self.last_id += num_crawled_docs
-        self.no_docs += num_crawled_docs
-        self.save_docs_info()
+        if (num_crawled_docs != 0):      
+            # Create or update the inverted index 
+            self.inverted_index.create_inverted_index(self.temp_filename)
+            os.remove(self.temp_filename)
+            # Update documents' info
+            self.last_id += num_crawled_docs
+            self.no_docs += num_crawled_docs
+            self.save_docs_info()
         self.is_maintaining = False
         print("Success")
 

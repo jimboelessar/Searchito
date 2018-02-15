@@ -289,3 +289,10 @@ input:checked + .slider:before {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+#status {
+    text-align: right;
+    position: absolute;
+    bottom: 1%;
+    right: 2%;
+}

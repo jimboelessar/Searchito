@@ -72,6 +72,7 @@ class SearchEngine:
         self.no_docs += num_crawled_docs
         self.save_docs_info()
         self.is_maintaining = False
+        print("Success")
 
     # Updates inverted index with the documents inside the uploads folder.
     def update_from_uploaded(self):

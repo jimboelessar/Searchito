@@ -17,7 +17,11 @@
             </span>
             <form id="searchform" action="/query" method="get" onsubmit="return search.value!=''" role="search">
                 <span>
-                    <input id="queryboxMini" name="search" placeholder="" autocomplete="off" spellcheck="false" value="{{query}}" title="Search" type="text">
+                    {% if boolean %}
+                        <input id="queryboxMini" name="search" placeholder="(Metallica and not Beyonce) or Manowar" autocomplete="off" spellcheck="false" value="{{query}}" title="Search" type="text">
+                    {% else %}
+                        <input id="queryboxMini" name="search" placeholder="" autocomplete="off" spellcheck="false" value="{{query}}" title="Search" type="text">
+                    {% endif %}
                 </span>
                 <span class="buttspan">
                     <input type="submit" value="Searchito Searchito" id="searchbutt" />

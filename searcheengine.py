@@ -64,11 +64,11 @@ class SearchEngine:
         if (num_crawled_docs != 0):      
             # Create or update the inverted index 
             self.inverted_index.create_inverted_index(self.temp_filename)
-            os.remove(self.temp_filename)
             # Update documents' info
             self.last_id += num_crawled_docs
             self.no_docs += num_crawled_docs
             self.save_docs_info()
+        os.remove(self.temp_filename)
         self.is_maintaining = False
         print("Success")
 

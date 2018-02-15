@@ -30,7 +30,7 @@ def results():
     else:
         return render_template("results.html", query=query, boolean=boolean, top=top, updating=True)
 
-@app.route('/crawl', methods=['POST'])
+@app.route('/crawl', methods=['GET','POST'])
 def crawl():
     if engine.is_maintaining:
         message = "Searchito is being updated. Try again later."
@@ -42,7 +42,7 @@ def crawl():
         message = "Crawling started.."
     return render_template("index.html", message=message, status=get_status())
 
-@app.route('/uploader', methods = ['POST'])
+@app.route('/uploader', methods = ['GET', 'POST'])
 def upload_files():
     if engine.is_maintaining:
          message = "Searchito is being updated. Try again later."

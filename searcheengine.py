@@ -95,15 +95,14 @@ class SearchEngine:
                 documents.append(new_name)
                 # Move document to the local documents
                 shutil.move(self.uploads_folder + new_name, self.documents_folder[:-1])
-            except UnicodeDecodeError as e:
+            except UnicodeDecodeError:
                 # Delete file, can not decode it
                 os.remove(self.uploads_folder + f)
-
         # Create a list of documents path and their ids
         doc_ids = []
         for doc_name in documents:
             self.last_id += 1
-            doc_ids.append([self.last_id, self.documents_folder + f])
+            doc_ids.append([self.last_id, self.documents_folder + doc_name])
     
         # Update the inverted index and get documents length
         lengths = self.inverted_index.update_index(doc_ids)

@@ -3,9 +3,10 @@
 import shelve
 import sys
 import math
-from csvsorting import csvsort
-from aidkit import filter_text
+import aidkit as kit
 from collections import Counter
+import big_file_sort as sorter
+import os
 
 class InvertedIndex:
 
@@ -62,8 +63,13 @@ class InvertedIndex:
     def create_inverted_index(self, temp_file_name):
         open_again = self.is_opened
         self.close()
+
         # Sort file externally
-        csvsort(temp_file_name, [0], has_header=False)
+        kit.create_dicrectory('tmp') # Create folder for temporary chunks of data
+        sorter.sort_file(temp_file_name, 'files/sorted_terms', temp_file_location='tmp') # Sort data
+        kit.delete_files_of_directory('tmp') # Delete chunks of data, no more needed (the sort function does not handle it)
+        os.remove(temp_file_name) # Remove unsorted file
+        os.rename('files/sorted_terms', temp_file_name) # Rename sorted to the name of the unsorted file (used later)
 
         # Create the inverted index to disk
         # Open index if already exists or create a new one
@@ -121,7 +127,7 @@ class InvertedIndex:
             # Open document and read it
             with open(doc_info[1], 'r') as doc_file:
                 doc = doc_file.read()
-            filtered_words = filter_text(doc)
+            filtered_words = kit.filter_text(doc)
             doc_lengths.append(math.sqrt(len(filtered_words)))
             # Find each term's frequency
             terms_freq = Counter(filtered_words)
@@ -148,7 +154,7 @@ class InvertedIndex:
             # Open document and read it
             with open(id_doc_map[id],'r') as doc_file:
                 doc = doc_file.read()
-            filtered_words = filter_text(doc)
+            filtered_words = kit.filter_text(doc)
             # Find each term's frequency
             terms_freq = {}
             for word in filtered_words:

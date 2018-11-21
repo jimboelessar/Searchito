@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import nltk.tokenize
 import string
-import shelve
 import re # Regular Expressions
-from nltk.stem.porter import *
 import os
+import errno
+from nltk.stem.porter import *
 
 # Filters text by removing punctiations, allowing only english letters and
 # numbers,
@@ -49,3 +49,21 @@ def resolve_conflict(target_folder, basename):
             newname = '%s(%d)%s' % (name, count, ext)
             if not os.path.exists(os.path.join(target_folder, newname)):
                 return newname
+
+# Deletets all the files inside the given directory
+def delete_files_of_directory(directory):
+    for the_file in os.listdir(directory):
+        file_path = os.path.join(directory, the_file)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+        except Exception as e:
+            print(e)
+
+# Creates the given directory if it does not exist already
+def create_dicrectory(directory):
+    try:
+        os.makedirs(directory)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise

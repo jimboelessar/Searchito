@@ -1,59 +1,80 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" type="image/ico" href="{{ url_for('static', filename='favicon.png') }}"/>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
-        <title>{{query}} - Searchito</title>
-    </head>
-    <body>
-        <div id="wrapperSearch">
-            <header id="searchHeader">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/ico" href="{{ url_for('static', filename='favicon.png') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <title>{{query}} - Searchito</title>
+</head>
+<body>
+    <div id="wrapperSearch">
+        <header id="searchHeader">
+            <span>
+                <a href="/">
+                    <img src="{{ url_for('static', filename='searchito.png') }}" alt="Searchito Logo" id="logoMini">
+                </a>
+            </span>
+            <form id="searchform" action="/query" method="get" onsubmit="return search.value!=''" role="search">
                 <span>
-                    <a href="/">
-                        <img src="{{ url_for('static', filename='searchito.png') }}" alt="Searchito Logo" id="logoMini">
-                    </a>
+                    {% if boolean %}
+                        <input id="queryboxMini" name="search" placeholder="(Metallica and not Beyonce) or Manowar" autocomplete="off" spellcheck="false" value="{{query}}" title="Search" type="text">
+                    {% else %}
+                        <input id="queryboxMini" name="search" placeholder="" autocomplete="off" spellcheck="false" value="{{query}}" title="Search" type="text">
+                    {% endif %}
                 </span>
-                    <form id="searchform" action="/query" method="get" onsubmit="return search.value!=''" role="search">
-                        <span>
-                            <input id="queryboxMini" name="search" autocomplete="off" spellcheck="false" value="{{query}}" title="Search" type="text" >
-                        </span>
-                        <span class="buttspan">
-                            <input type="submit" value="Searchito Searchito" id="searchbutt"/>
-                        </span>
-                        <span> Top </span>
-                        <span>
-                            <select id="topkselect" name="top" title="Top">
-                                <option {{'selected="selected"' if top == '5' ""}} value="5">5</option>
-                                <option {{'selected="selected"' if top == '10' ""}} value="10">10</option>
-                                <option {{'selected="selected"' if top == '20' ""}} value="20">20</option>
-                                <option {{'selected="selected"' if top == '50' ""}} value="50">50</option>
-                            </select>
-                        </span>
-                        <span> results</span>
-                        <span id="qtype-check">
-                            <span class="qtypeMini">Boolean</span>
-                            <label class="switch">
-                                <input id="typeCheck" type="checkbox" name="mode" value="vector" {{'checked="checked"' if boolean == False else ""}}>
-                                <span class="slider round"></span>
-                            </label>
-                            <span class="qtypeMini">Vector</span>
-                        </span>
-                    </form>
-            </header>
-            <main>
-                <ul id="doclist">
-                    {% for result in results[::-1] %}
-                    <li>
-                        <a href="{{result}}">{{result}}</a>
-                    </li>
-                    {% endfor %}
+                <span class="buttspan">
+                    <input type="submit" value="Searchito Searchito" id="searchbutt" />
+                </span>
+                <span> Top </span>
+                <span>
+                    <select id="topkselect" name="top" title="Top">
+                        <option {{'selected="selected"' if top == '5' ""}} value="5">5</option>
+                        <option {{'selected="selected"' if top == '10' ""}} value="10">10</option>
+                        <option {{'selected="selected"' if top == '20' ""}} value="20">20</option>
+                        <option {{'selected="selected"' if top == '50' ""}} value="50">50</option>
+                    </select>
+                </span>
+                <span> results</span>
+                <span id="qtype-check">
+                    <span class="qtypeMini">Boolean</span>
+                    <label class="switch">
+                        <input id="typeCheck" type="checkbox" autocomplete="off" name="mode" value="vector" {{'' if boolean else 'checked="checked"'}}>
+                        <span class="slider round"></span>
+                    </label>
+                    <span class="qtypeMini">Vector</span>
+                </span>
+            </form>
+        </header>
+        <main>
+            {% if updating %}
+            <div>
+                <p>Searchito is currently <b>updating</b>.</p>
+            </div>
+            {% elif not results %}
+            <div id="noResults">
+                <p>Searchito could not find any related documents to <b id="queryResult">{{query}}</b>.</p>
+                <p>Hints:</p>
+                <ul id="hintList">
+                    <li>Make sure the spelling of the words is correct.</li>
+                    <li>Try other keywords.</li>
+                    <li>Try more general keywords.</li>
+                    <li>Try less keywords.</li>
                 </ul>
-            </main>
-            <footer>
-
-            </footer>
-        </div>
-    </body>
+            </div>
+            {% else %}
+            <p id="resultNum">{{results.__len__()}} results returned</p>
+            <ul id="doclist">
+                {% for result in results %}
+                <li>
+                    <a href="{{result}}">{{result}}</a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </main>
+        <footer></footer>
+    </div>
+    <script src="{{ url_for('static', filename='disablePlaceholder.js') }}"></script>
+</body>
 </html>

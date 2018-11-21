@@ -8,7 +8,7 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
         <title> Searchito </title>
     </head>
-    <body>
+    <body id="index-body">
         <div id="wrapper">
             <header>
                 <div>
@@ -21,7 +21,7 @@
                 <form id="searchform" action="/query" method="get" onsubmit="return search.value!=''" role="search">
                     <br>
                     <span>
-                        <input id="querybox" name="search" placeholder="(Metallica and not Beyonce) or Manowar " autocomplete="off" spellcheck="false" value="{{query}}" title="Search" type="text">
+                        <input id="querybox" name="search" placeholder="" autocomplete="off" spellcheck="false" value="{{query}}" title="Search" type="text">
                     </span>
                     <span> Top </span>
                     <span>
@@ -36,7 +36,7 @@
                     <div id="qtype-check">
                         <span class="qtype">Boolean</span>
                         <label class="switch">
-                            <input id="typeCheck" type="checkbox" name="mode" value="vector" {{'checked="checked"' if boolean else ""}}>
+                            <input id="typeCheck" type="checkbox" autocomplete="off" name="mode" value="vector" {{'' if boolean else 'checked="checked"'}}>
                             <span class="slider round"></span>
                         </label>
                         <span class="qtype">Vector</span>
@@ -51,7 +51,7 @@
                 <form id="crawlform" action="/crawl" method="POST">
                     <button id="crawlingbutt" name="crawl" type="submit">Crawl</button>
                     <span> in </span>
-                    <input type="text" id="crawltext" name=crawl-link title="Crawl" value="https://en.wikipedia.org/wiki/Information_retrieval">
+                    <input type="text" id="crawltext" name=crawl-link title="Crawl" placeholder="e.g: https://en.wikipedia.org/wiki/Information_retrieval">
                     <span> for </span>
                     <span>
                         <select id="crawlselect" name="crawl-number" title="crawlnum">
@@ -69,11 +69,15 @@
                     <input type="file" name="files" value="Choose File" multiple/>
                     <input type="submit" value="Submit"/>
                 </form>
+                <h3 id="status">Status: {{status}}</h3>
+                {% if message %}
+                    <div id="infoMessage"> {{message}} </div>
+                {% endif %}
             </main>
             <footer>
 
             </footer>
         </div>
-    <script src="{{ url_for('static', filename='disablePlaceholder.js') }}"></script>
+        <script src="{{ url_for('static', filename='disablePlaceholder.js') }}"></script>
     </body>
 </html>

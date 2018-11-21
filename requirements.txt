@@ -1,7 +1,10 @@
 # Install via 'pip install -r requirements.txt'
 
-flask
-boolean
+big_file_sort
 boolean.py
-nltk
 bs4
+Flask
+nltk
+nltk.punkt
+pathlib
+Werkzeug

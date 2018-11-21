@@ -1,5 +1,4 @@
 import aidkit as kit
-from invertedindex import InvertedIndex
 import boolean
 
 class ExpressionTree(object):
@@ -51,7 +50,7 @@ class ExpressionTree(object):
             return result
 
 
-    # Recreates the expression it holds in string format.
+    # Recreates the expression it holds in string format (for testing purposes).
     def print(self):
         if self.is_term:
             return self.term
